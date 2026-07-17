@@ -66,18 +66,18 @@ export type LegalPage = {
 };
 
 const imageSet = {
-  hero: "/assets/hostess-hero-black.webp",
-  group: "/assets/hostess-group-navy.webp",
-  detail: "/assets/hostess-ivory-suit.webp",
-  ivory: "/assets/hostess-ivory-suit.webp",
-  burgundy: "/assets/hostess-burgundy.webp",
-  emerald: "/assets/hostess-emerald.webp",
-  duo: "/assets/hostess-duo.webp",
-  classicBlack: "/assets/gangnam-woman-hero.webp",
-  classicGroup: "/assets/gangnam-women-group.webp",
-  classicBlue: "/assets/gangnam-woman-detail.webp",
-  lounge: "/assets/gangnam-venue-card.webp",
-  city: "/assets/gangnam-night-hero.webp",
+  hero: "/assets/idol-hero-bright.webp",
+  group: "/assets/idol-group-luminous.webp",
+  detail: "/assets/idol-ivory-suit.webp",
+  ivory: "/assets/idol-ivory-suit.webp",
+  burgundy: "/assets/idol-coral-lounge.webp",
+  emerald: "/assets/idol-duo-pastel.webp",
+  duo: "/assets/idol-duo-pastel.webp",
+  classicBlack: "/assets/idol-lilac-dress.webp",
+  classicGroup: "/assets/idol-group-luminous.webp",
+  classicBlue: "/assets/idol-lilac-dress.webp",
+  lounge: "/assets/idol-coral-lounge.webp",
+  city: "/assets/idol-hero-bright.webp",
 };
 
 export const categories: Category[] = [

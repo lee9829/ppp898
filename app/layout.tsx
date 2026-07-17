@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SiteEnhancements from "./site-enhancements";
 
@@ -23,10 +23,10 @@ export const metadata: Metadata = {
       "강남 밤문화 업종의 차이, 주대·TC·RT 뜻, 룸과 인원 선택, 예약·결제 전에 확인할 내용을 한눈에 살펴보세요.",
     images: [
       {
-        url: "/assets/hostess-hero-black.webp",
+        url: "/assets/idol-hero-bright.webp",
         width: 1600,
         height: 1000,
-        alt: "블랙 시퀸 미니드레스를 입고 고급 라운지에 서 있는 20대 성인 한국 여성 모델",
+        alt: "밝은 럭셔리 라운지의 20대 성인 아이돌풍 한국 여성 모델 세 명",
       },
     ],
   },
@@ -40,6 +40,11 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#f7f9ff",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,7 +53,6 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <meta name="theme-color" content="#07090d" />
         <link rel="preconnect" href="https://cdn.jsdelivr.net" />
         <link
           rel="stylesheet"

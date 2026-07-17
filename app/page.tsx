@@ -1,4 +1,5 @@
-/* eslint-disable @next/next/no-html-link-for-pages, @next/next/no-img-element */
+/* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
 import {
   BottomContact,
   CategoryImageCard,
@@ -36,7 +37,7 @@ export default function Home() {
       <SiteHeader />
       <main id="main-content">
         <section className="people-hero" id="top">
-          <img className="people-hero-image" src={imageSet.hero} alt="블랙 시퀸 미니드레스를 입고 고급 라운지에 서 있는 20대 성인 한국 여성 모델" width="1600" height="1000" />
+          <img className="people-hero-image" src={imageSet.hero} alt="밝은 럭셔리 라운지에서 아이보리·블루·라일락 드레스를 입은 20대 성인 한국 여성 모델 세 명" width="1600" height="1000" />
           <div className="people-hero-shade" aria-hidden="true" />
           <div className="people-hero-grid" aria-hidden="true" />
           <div className="shell people-hero-inner">
@@ -45,8 +46,8 @@ export default function Home() {
               <h1>강남 밤문화,<br /><em>업종 비교</em>부터 예약 전 확인까지.</h1>
               <p>하이퍼블릭, 셔츠룸, 쩜오, 텐카페처럼 익숙하지 않은 업종의 차이와 주대·TC·RT 용어, 예약할 때 물어볼 내용을 한눈에 살펴보세요.</p>
               <div className="people-hero-actions">
-                <a className="primary-button large-button" href="/하이퍼블릭">업종별 차이 보기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></a>
-                <a className="ghost-button" href="/블로그/강남-하이퍼블릭-이용팁">첫 방문 체크 <i className="ph ph-arrow-right" aria-hidden="true" /></a>
+                <Link className="primary-button large-button" href="/하이퍼블릭">업종별 차이 보기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></Link>
+                <Link className="ghost-button" href="/블로그/강남-하이퍼블릭-이용팁">첫 방문 체크 <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
               </div>
               <form className="quick-search compact-search" id="quick-search" action="/">
                 <i className="ph ph-magnifying-glass" aria-hidden="true" />
@@ -58,7 +59,7 @@ export default function Home() {
             </div>
             <div className="hero-model-caption">
               <span>GANGNAM NIGHT GUIDE</span>
-              <strong>BLACK · WHITE · BLUE</strong>
+              <strong>IVORY · BLUE · LILAC</strong>
             </div>
           </div>
           <a className="scroll-cue" href="#category-pages"><span>SCROLL TO EXPLORE</span><i className="ph ph-arrow-down" aria-hidden="true" /></a>
@@ -85,7 +86,7 @@ export default function Home() {
             <div className="people-venue-grid home-venue-grid">
               {venueDirectory.slice(0, 6).map((venue, index) => <VenueCard venue={venue} category={venue.category} index={index} key={`${venue.category.slug}-${venue.slug}`} />)}
             </div>
-            <div className="center-link"><a className="outline-button" href="/하이퍼블릭">하이퍼블릭 업소 정보 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></a></div>
+            <div className="center-link"><Link className="outline-button" href="/하이퍼블릭">하이퍼블릭 업소 정보 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link></div>
           </div>
         </section>
 
@@ -122,17 +123,17 @@ export default function Home() {
           <div className="shell">
             <div className="section-heading split-heading">
               <div><p className="section-kicker">NIGHT GUIDE JOURNAL</p><h2>방문 전 궁금증을 푸는<br />실전 이용 가이드</h2></div>
-              <a className="text-link" href="/블로그">블로그 전체 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></a>
+              <Link className="text-link" href="/블로그">블로그 전체 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
             </div>
             <div className="editorial-post-grid">
               {blogPosts.map((post, index) => (
                 <article className="editorial-post-card" key={post.slug}>
-                  <a className="editorial-post-image" href={`/블로그/${post.slug}`}>
+                  <Link className="editorial-post-image" href={`/블로그/${post.slug}`}>
                     <img src={post.image} alt={`${post.title} 글과 함께 보는 아이돌풍 드레스의 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" />
                     <span className="people-venue-overlay" aria-hidden="true" />
                     <strong>0{index + 1}</strong>
-                  </a>
-                  <div><p>{post.category} · {post.readTime}</p><h3><a href={`/블로그/${post.slug}`}>{post.title}</a></h3><span>{post.excerpt}</span><a href={`/블로그/${post.slug}`}>글 읽기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></a></div>
+                  </Link>
+                  <div><p>{post.category} · {post.readTime}</p><h3><Link href={`/블로그/${post.slug}`}>{post.title}</Link></h3><span>{post.excerpt}</span><Link href={`/블로그/${post.slug}`}>글 읽기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></Link></div>
                 </article>
               ))}
             </div>

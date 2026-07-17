@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-html-link-for-pages, @next/next/no-img-element */
+/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   BottomContact,
@@ -27,13 +28,34 @@ import {
 
 type PageParams = { slug: string[] };
 
-function resolvePage(slug: string[]) {
+function normalizeSegment(segment: string) {
+  try {
+    return decodeURIComponent(segment).normalize("NFC");
+  } catch {
+    return segment.normalize("NFC");
+  }
+}
+
+function resolvePage(rawSlug: string[]) {
+  const slug = rawSlug.map(normalizeSegment);
   const [first, second] = slug;
   const category = categories.find((item) => item.slug === first);
   const venue = category?.venues.find((item) => item.slug === second);
   const post = first === "블로그" ? blogPosts.find((item) => item.slug === second) : undefined;
   const legal = legalPages[first];
-  return { first, category, venue, post, legal };
+  return { slug, first, category, venue, post, legal };
+}
+
+export function generateStaticParams(): PageParams[] {
+  return [
+    ...categories.map((category) => ({ slug: [category.slug] })),
+    ...categories.flatMap((category) =>
+      category.venues.map((venue) => ({ slug: [category.slug, venue.slug] })),
+    ),
+    { slug: ["블로그"] },
+    ...blogPosts.map((post) => ({ slug: ["블로그", post.slug] })),
+    ...Object.keys(legalPages).map((pageKey) => ({ slug: [pageKey] })),
+  ];
 }
 
 function faqSchema(faqs: readonly FaqItem[]) {
@@ -49,8 +71,8 @@ function faqSchema(faqs: readonly FaqItem[]) {
 }
 
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
-  const { slug } = await params;
-  const { first, category, venue, post, legal } = resolvePage(slug);
+  const { slug: rawSlug } = await params;
+  const { slug, first, category, venue, post, legal } = resolvePage(rawSlug);
 
   if (slug.length === 2 && venue && category) {
     const title = `강남 ${venue.name} ${category.shortName} | 예약·비용 확인`;
@@ -275,7 +297,7 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
         <section className="section reservation-section" id="reservation">
           <div className="shell reservation-panel">
             <div className="reservation-image"><img src={reservationImage} alt={`${venue.name} 예약 체크리스트 옆 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /></div>
-            <div className="reservation-copy"><p className="section-kicker">RESERVATION CHECK</p><h2>예약 메시지에<br />네 가지를 남기세요.</h2><ul>{venue.reservationQuestions.map((item) => <li key={item}><i className="ph ph-check-circle" aria-hidden="true" />{item}</li>)}</ul><a className="primary-button" href="/블로그/주대-tc-rt-용어">주대·TC·RT 뜻 보기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></a></div>
+            <div className="reservation-copy"><p className="section-kicker">RESERVATION CHECK</p><h2>예약 메시지에<br />네 가지를 남기세요.</h2><ul>{venue.reservationQuestions.map((item) => <li key={item}><i className="ph ph-check-circle" aria-hidden="true" />{item}</li>)}</ul><Link className="primary-button" href="/블로그/주대-tc-rt-용어">주대·TC·RT 뜻 보기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></Link></div>
           </div>
         </section>
 
@@ -295,7 +317,7 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
           </div>
         </section>
 
-        {related.length > 0 && <section className="section related-venues-section"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">COMPARE MORE</p><h2>함께 비교할 {category.shortName}</h2></div><a className="text-link" href={`/${category.slug}`}>{category.shortName} 전체 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></a></div><div className="people-venue-grid related-grid">{related.map((item, index) => <VenueCard venue={item} category={category} index={index} key={item.slug} />)}</div></div></section>}
+        {related.length > 0 && <section className="section related-venues-section"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">COMPARE MORE</p><h2>함께 비교할 {category.shortName}</h2></div><Link className="text-link" href={`/${category.slug}`}>{category.shortName} 전체 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link></div><div className="people-venue-grid related-grid">{related.map((item, index) => <VenueCard venue={item} category={category} index={index} key={item.slug} />)}</div></div></section>}
         <FaqBlock title={`${venue.name} 자주 묻는 질문`} faqs={venue.faqs} />
         <BottomContact />
       </main>
@@ -310,7 +332,7 @@ function BlogIndex() {
   return (
     <><SiteHeader /><main id="main-content">
       <section className="blog-index-hero"><img src={imageSet.group} alt="글래머러스한 드레스를 입은 20대 성인 한국 여성 모델 네 명" width="1600" height="1000" /><span className="inner-hero-shade" aria-hidden="true" /><div className="shell"><Breadcrumb items={[{ label: "블로그" }]} /><p className="eyebrow"><span>EDITORIAL</span>NIGHT GUIDE JOURNAL</p><h1>강남 밤문화 예약 전<br /><em>꼭 알아둘 실전 정보</em></h1><p>첫 방문 체크리스트부터 주대·TC·RT 뜻, 안전한 음주와 결제 에티켓까지 검색 질문별로 깊이 있게 안내합니다.</p></div></section>
-      <section className="section blog-index-content"><div className="shell"><div className="blog-filter-row"><strong>전체 글</strong><span>첫 방문</span><span>가격 용어</span><span>안전·에티켓</span></div><div className="blog-index-grid">{blogPosts.map((post, index) => <article className={index === 0 ? "blog-feature-card" : "blog-list-card"} key={post.slug}><a href={`/블로그/${post.slug}`}><img src={post.image} alt={`${post.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" /><span className="people-venue-overlay" aria-hidden="true" /></a><div><p>{post.category} · {post.date} · {post.readTime}</p><h2><a href={`/블로그/${post.slug}`}>{post.title}</a></h2><span>{post.excerpt}</span><a className="card-detail-link" href={`/블로그/${post.slug}`}>자세히 읽기 <i className="ph ph-arrow-right" aria-hidden="true" /></a></div></article>)}</div></div></section>
+      <section className="section blog-index-content"><div className="shell"><div className="blog-filter-row"><strong>전체 글</strong><span>첫 방문</span><span>가격 용어</span><span>안전·에티켓</span></div><div className="blog-index-grid">{blogPosts.map((post, index) => <article className={index === 0 ? "blog-feature-card" : "blog-list-card"} key={post.slug}><Link href={`/블로그/${post.slug}`}><img src={post.image} alt={`${post.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" /><span className="people-venue-overlay" aria-hidden="true" /></Link><div><p>{post.category} · {post.date} · {post.readTime}</p><h2><Link href={`/블로그/${post.slug}`}>{post.title}</Link></h2><span>{post.excerpt}</span><Link className="card-detail-link" href={`/블로그/${post.slug}`}>자세히 읽기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link></div></article>)}</div></div></section>
       <BottomContact />
     </main><SiteFooter /><MobileBottomCta /></>
   );
@@ -342,7 +364,7 @@ function BlogArticle({ post }: { post: BlogPost }) {
         </div>
       </div>
     </article>
-    <section className="section article-related"><div className="shell"><div className="section-heading"><p className="section-kicker">MORE STORIES</p><h2>함께 읽으면 좋은 글</h2></div><div className="editorial-post-grid">{blogPosts.filter((item) => item.slug !== post.slug).map((item, index) => <article className="editorial-post-card" key={item.slug}><a className="editorial-post-image" href={`/블로그/${item.slug}`}><img src={item.image} alt={`${item.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /><strong>0{index + 1}</strong></a><div><p>{item.category} · {item.readTime}</p><h3><a href={`/블로그/${item.slug}`}>{item.title}</a></h3><span>{item.excerpt}</span></div></article>)}</div></div></section>
+    <section className="section article-related"><div className="shell"><div className="section-heading"><p className="section-kicker">MORE STORIES</p><h2>함께 읽으면 좋은 글</h2></div><div className="editorial-post-grid">{blogPosts.filter((item) => item.slug !== post.slug).map((item, index) => <article className="editorial-post-card" key={item.slug}><Link className="editorial-post-image" href={`/블로그/${item.slug}`}><img src={item.image} alt={`${item.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /><strong>0{index + 1}</strong></Link><div><p>{item.category} · {item.readTime}</p><h3><Link href={`/블로그/${item.slug}`}>{item.title}</Link></h3><span>{item.excerpt}</span></div></article>)}</div></div></section>
     </main><SiteFooter /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} /></>
   );
 }
@@ -362,8 +384,8 @@ function LegalPage({ pageKey, page }: { pageKey: string; page: LegalPageData }) 
 }
 
 export default async function DynamicPage({ params }: { params: Promise<PageParams> }) {
-  const { slug } = await params;
-  const { first, category, venue, post, legal } = resolvePage(slug);
+  const { slug: rawSlug } = await params;
+  const { slug, first, category, venue, post, legal } = resolvePage(rawSlug);
   if (slug.length === 2 && category && venue) return <VenuePage category={category} venue={venue} />;
   if (slug.length === 1 && category) return <CategoryPage category={category} />;
   if (slug.length === 2 && first === "블로그" && post) return <BlogArticle post={post} />;
