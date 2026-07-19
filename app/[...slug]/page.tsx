@@ -2,16 +2,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogExplorer from "../blog-explorer";
 import {
   BottomContact,
   Breadcrumb,
   FaqBlock,
   MobileBottomCta,
   PriceTable,
+  SeoLongform,
   SiteFooter,
   SiteHeader,
   VenueCard,
 } from "../site-components";
+import {
+  buildBlogArticleSeoChapters,
+  buildBlogIndexSeoChapters,
+  buildCategorySeoChapters,
+  buildVenueSeoChapters,
+  countSeoWords,
+} from "../seo-content";
+import { siteUrl } from "../site-config";
 import {
   blogPosts,
   categories,
@@ -79,6 +89,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     return {
       title,
       description: venue.metaDescription,
+      keywords: [`강남 ${venue.name}`, `${venue.name} ${category.shortName}`, `${venue.name} 예약`, `${venue.name} 비용`],
       alternates: { canonical: `/${category.slug}/${venue.slug}` },
       openGraph: { title, description: venue.metaDescription, url: `/${category.slug}/${venue.slug}`, images: [venue.image] },
     };
@@ -88,6 +99,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     return {
       title,
       description: category.longDescription,
+      keywords: [category.name, `${category.shortName} 뜻`, `${category.shortName} 가격`, `${category.shortName} 예약`],
       alternates: { canonical: `/${category.slug}` },
       openGraph: { title, description: category.longDescription, url: `/${category.slug}`, images: [category.image] },
     };
@@ -96,6 +108,9 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     return {
       title: post.title,
       description: post.excerpt,
+      keywords: [post.title, post.category, "강남 밤문화", "강남 룸 예약"],
+      authors: [{ name: "강남의 밤 편집팀" }],
+      category: post.category,
       alternates: { canonical: `/블로그/${post.slug}` },
       openGraph: { type: "article", title: post.title, description: post.excerpt, url: `/블로그/${post.slug}`, images: [post.image], publishedTime: post.isoDate },
     };
@@ -103,7 +118,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   if (slug.length === 1 && first === "블로그") {
     const title = "강남 밤문화 블로그 | 예약·가격 용어·에티켓";
     const description = "강남 하이퍼블릭 첫 방문 체크리스트, 주대·TC·RT 뜻, 안전한 예약과 결제 에티켓을 검색 질문별로 안내합니다.";
-    return { title, description, alternates: { canonical: "/블로그" }, openGraph: { title, description, url: "/블로그", images: [imageSet.group] } };
+    return { title, description, keywords: ["강남 밤문화 블로그", "강남 룸 예약", "주대 TC RT", "강남 밤문화 에티켓"], alternates: { canonical: "/블로그" }, openGraph: { title, description, url: "/블로그", images: [imageSet.group] } };
   }
   if (slug.length === 1 && legal) {
     return { title: legal.title, description: legal.description, alternates: { canonical: `/${first}` } };
@@ -115,12 +130,13 @@ function CategoryPage({ category }: { category: Category }) {
   const categoryIndex = categories.findIndex((item) => item.slug === category.slug);
   const introImage = hostessImagePool[(categoryIndex + 2) % hostessImagePool.length];
   const guideImage = hostessImagePool[(categoryIndex + 5) % hostessImagePool.length];
+  const seoChapters = buildCategorySeoChapters(category);
   const categorySchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: `${category.name} 뜻·가격·예약 가이드`,
     description: category.longDescription,
-    url: `https://www.gangnamnight.com/${category.slug}`,
+    url: `${siteUrl}/${category.slug}`,
     inLanguage: "ko-KR",
   };
 
@@ -210,6 +226,12 @@ function CategoryPage({ category }: { category: Category }) {
             <PriceTable categoryName={category.name} />
           </div>
         </section>
+        <SeoLongform
+          title={`${category.name} 완전 가이드`}
+          description={`${category.name}의 뜻과 공간, 비용, 예약, 방문 당일 확인사항을 검색 의도에 맞춰 H2·H3 구조로 정리했습니다.`}
+          chapters={seoChapters}
+          id="category-complete-guide"
+        />
         <FaqBlock title={`${category.shortName} 자주 묻는 질문`} faqs={category.faqs} />
         <BottomContact />
       </main>
@@ -225,13 +247,14 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
   const venueIndex = venueDirectory.findIndex((item) => item.category.slug === category.slug && item.slug === venue.slug);
   const introImage = hostessImagePool[(venueIndex + 2) % hostessImagePool.length];
   const reservationImage = hostessImagePool[(venueIndex + 5) % hostessImagePool.length];
+  const seoChapters = buildVenueSeoChapters(category, venue);
   const venueSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: `강남 ${venue.name} ${category.shortName} 예약·이용 정보`,
     description: venue.metaDescription,
-    url: `https://www.gangnamnight.com/${category.slug}/${venue.slug}`,
-    isPartOf: { "@type": "WebSite", name: "강남의 밤", url: "https://www.gangnamnight.com/" },
+    url: `${siteUrl}/${category.slug}/${venue.slug}`,
+    isPartOf: { "@type": "WebSite", name: "강남의 밤", url: `${siteUrl}/` },
     inLanguage: "ko-KR",
   };
 
@@ -317,6 +340,13 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
           </div>
         </section>
 
+        <SeoLongform
+          title={`강남 ${venue.name} ${category.shortName} 완전 가이드`}
+          description={`${venue.name}을 검색한 성인 이용자가 룸, 시간, 비용, 예약과 안전한 이용 기준을 한 페이지에서 확인할 수 있도록 정리했습니다.`}
+          chapters={seoChapters}
+          id="venue-complete-guide"
+        />
+
         {related.length > 0 && <section className="section related-venues-section"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">COMPARE MORE</p><h2>함께 비교할 {category.shortName}</h2></div><Link className="text-link" href={`/${category.slug}`}>{category.shortName} 전체 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link></div><div className="people-venue-grid related-grid">{related.map((item, index) => <VenueCard venue={item} category={category} index={index} key={item.slug} />)}</div></div></section>}
         <FaqBlock title={`${venue.name} 자주 묻는 질문`} faqs={venue.faqs} />
         <BottomContact />
@@ -329,42 +359,76 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
 }
 
 function BlogIndex() {
+  const seoChapters = buildBlogIndexSeoChapters();
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "강남 밤문화 블로그",
+    description: "강남 밤문화 예약, 비용 용어와 안전한 이용 정보를 다루는 실전 가이드 모음",
+    url: `${siteUrl}/블로그`,
+    inLanguage: "ko-KR",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: blogPosts.map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `${siteUrl}/블로그/${post.slug}`,
+        name: post.title,
+      })),
+    },
+  };
   return (
     <><SiteHeader /><main id="main-content">
       <section className="blog-index-hero"><img src={imageSet.group} alt="글래머러스한 드레스를 입은 20대 성인 한국 여성 모델 네 명" width="1600" height="1000" /><span className="inner-hero-shade" aria-hidden="true" /><div className="shell"><Breadcrumb items={[{ label: "블로그" }]} /><p className="eyebrow"><span>EDITORIAL</span>NIGHT GUIDE JOURNAL</p><h1>강남 밤문화 예약 전<br /><em>꼭 알아둘 실전 정보</em></h1><p>첫 방문 체크리스트부터 주대·TC·RT 뜻, 안전한 음주와 결제 에티켓까지 검색 질문별로 깊이 있게 안내합니다.</p></div></section>
-      <section className="section blog-index-content"><div className="shell"><div className="blog-filter-row"><strong>전체 글</strong><span>첫 방문</span><span>가격 용어</span><span>안전·에티켓</span></div><div className="blog-index-grid">{blogPosts.map((post, index) => <article className={index === 0 ? "blog-feature-card" : "blog-list-card"} key={post.slug}><Link href={`/블로그/${post.slug}`}><img src={post.image} alt={`${post.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" /><span className="people-venue-overlay" aria-hidden="true" /></Link><div><p>{post.category} · {post.date} · {post.readTime}</p><h2><Link href={`/블로그/${post.slug}`}>{post.title}</Link></h2><span>{post.excerpt}</span><Link className="card-detail-link" href={`/블로그/${post.slug}`}>자세히 읽기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link></div></article>)}</div></div></section>
+      <section className="section blog-index-content"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">SEARCH THE JOURNAL</p><h2>상황에 맞는 가이드를<br />빠르게 찾아보세요.</h2></div><p>카테고리를 선택하거나 제목·주제로 검색할 수 있습니다. 모든 글은 5,000자 이상의 장문 원고와 단계별 목차를 제공합니다.</p></div><BlogExplorer posts={blogPosts} /></div></section>
+      <SeoLongform
+        title="강남 밤문화 블로그 활용 가이드"
+        description="첫 방문, 가격, 업종 비교, 단체 모임과 안전 원칙까지 블로그를 검색 의도에 맞게 활용하는 방법입니다."
+        chapters={seoChapters}
+        id="blog-complete-guide"
+      />
       <BottomContact />
-    </main><SiteFooter /><MobileBottomCta /></>
+    </main><SiteFooter /><MobileBottomCta /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} /></>
   );
 }
 
 function BlogArticle({ post }: { post: BlogPost }) {
+  const seoChapters = buildBlogArticleSeoChapters(post);
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt,
     datePublished: post.isoDate,
+    dateModified: post.isoDate,
     author: { "@type": "Organization", name: "강남의 밤" },
     publisher: { "@type": "Organization", name: "강남의 밤" },
-    image: `https://www.gangnamnight.com${post.image}`,
-    mainEntityOfPage: `https://www.gangnamnight.com/블로그/${post.slug}`,
+    image: `${siteUrl}${post.image}`,
+    mainEntityOfPage: `${siteUrl}/블로그/${post.slug}`,
     inLanguage: "ko-KR",
+    wordCount: countSeoWords(seoChapters),
+    articleSection: post.category,
   };
   return (
     <><SiteHeader /><main id="main-content"><article>
       <header className="article-detail-hero"><div className="shell"><Breadcrumb items={[{ label: "블로그", href: "/블로그" }, { label: post.title }]} /><p className="eyebrow"><span>{post.category}</span>NIGHT GUIDE JOURNAL</p><h1>{post.title}</h1><p>{post.excerpt}</p><div className="article-meta"><span>강남의 밤 편집</span><span>{post.date}</span><span>읽는 시간 {post.readTime}</span></div></div></header>
       <figure className="article-lead-image"><img src={post.image} alt={`${post.title} 글과 함께 보는 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" /><span className="people-venue-overlay" aria-hidden="true" /></figure>
       <div className="shell article-body-layout">
-        <aside><strong>CONTENTS</strong>{post.sections.map((section) => <a href={`#${section.id}`} key={section.id}>{section.title}</a>)}</aside>
+        <aside><strong>CONTENTS</strong>{post.sections.map((section) => <a href={`#${section.id}`} key={section.id}>{section.title}</a>)}<a href="#article-complete-guide">5,000자 심층 가이드</a></aside>
         <div className="article-prose">
           <p className="article-lead">{post.lead}</p>
           {post.sections.map((section) => <section id={section.id} key={section.id}><span>{section.label}</span><h2>{section.title}</h2>{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}{section.checklist && <><h3>확인 체크리스트</h3><ul className="article-checklist">{section.checklist.map((item) => <li key={item}><i className="ph ph-check-circle" aria-hidden="true" />{item}</li>)}</ul></>}{section.quote && <div className="article-quote">“{section.quote}”</div>}</section>)}
           <div className="article-notice"><i className="ph ph-info" aria-hidden="true" /><p>운영시간과 비용은 날짜, 인원과 선택 조건에 따라 달라질 수 있습니다. 방문 전에 해당 사업자의 공식 안내를 확인하세요.</p></div>
         </div>
       </div>
+      <SeoLongform
+        title={`${post.title} 심층 가이드`}
+        description={`${post.excerpt} 실제 확인 순서와 질문 예시를 포함한 5,000자 이상의 확장 원고입니다.`}
+        chapters={seoChapters}
+        id="article-complete-guide"
+      />
     </article>
-    <section className="section article-related"><div className="shell"><div className="section-heading"><p className="section-kicker">MORE STORIES</p><h2>함께 읽으면 좋은 글</h2></div><div className="editorial-post-grid">{blogPosts.filter((item) => item.slug !== post.slug).map((item, index) => <article className="editorial-post-card" key={item.slug}><Link className="editorial-post-image" href={`/블로그/${item.slug}`}><img src={item.image} alt={`${item.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /><strong>0{index + 1}</strong></Link><div><p>{item.category} · {item.readTime}</p><h3><Link href={`/블로그/${item.slug}`}>{item.title}</Link></h3><span>{item.excerpt}</span></div></article>)}</div></div></section>
+    <section className="section article-related"><div className="shell"><div className="section-heading"><p className="section-kicker">MORE STORIES</p><h2>함께 읽으면 좋은 글</h2></div><div className="editorial-post-grid">{blogPosts.filter((item) => item.slug !== post.slug).slice(0, 3).map((item, index) => <article className="editorial-post-card" key={item.slug}><Link className="editorial-post-image" href={`/블로그/${item.slug}`}><img src={item.image} alt={`${item.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /><strong>0{index + 1}</strong></Link><div><p>{item.category} · {item.readTime}</p><h3><Link href={`/블로그/${item.slug}`}>{item.title}</Link></h3><span>{item.excerpt}</span></div></article>)}</div></div></section>
     </main><SiteFooter /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} /></>
   );
 }
@@ -378,7 +442,7 @@ function LegalPage({ pageKey, page }: { pageKey: string; page: LegalPageData }) 
         <article className="legal-content"><p className="legal-lead">{page.lead}</p>{page.sections.map((section, index) => <section id={`legal-${index + 1}`} key={section.title}><span>{String(index + 1).padStart(2, "0")}</span><h2>{section.title}</h2>{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}</article>
       </div>
     </main><SiteFooter />
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebPage", name: page.title, description: page.description, url: `https://www.gangnamnight.com/${pageKey}`, inLanguage: "ko-KR" }) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebPage", name: page.title, description: page.description, url: `${siteUrl}/${pageKey}`, inLanguage: "ko-KR" }) }} />
     </>
   );
 }

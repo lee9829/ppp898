@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SiteEnhancements from "./site-enhancements";
+import { siteUrl } from "./site-config";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.gangnamnight.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "강남 밤문화 가이드 | 업종 비교·가격 용어·예약 체크",
     template: "%s | 강남의 밤",

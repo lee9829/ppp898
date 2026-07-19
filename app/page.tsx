@@ -6,17 +6,20 @@ import {
   FaqBlock,
   MobileBottomCta,
   PriceTable,
+  SeoLongform,
   SiteFooter,
   SiteHeader,
   VenueCard,
 } from "./site-components";
 import { blogPosts, categories, imageSet, sharedFaqs, venueDirectory } from "./site-data";
+import { buildHomeSeoChapters } from "./seo-content";
+import { siteUrl } from "./site-config";
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "강남의 밤",
-  url: "https://www.gangnamnight.com/",
+  url: `${siteUrl}/`,
   description: "강남 밤문화 업종 차이, 비용 용어와 예약 전 확인사항을 성인 이용자 관점에서 정리한 정보 가이드",
   inLanguage: "ko-KR",
 };
@@ -32,6 +35,7 @@ const homeFaqSchema = {
 };
 
 export default function Home() {
+  const seoChapters = buildHomeSeoChapters();
   return (
     <>
       <SiteHeader />
@@ -139,6 +143,13 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <SeoLongform
+          title="강남 밤문화 업종 비교와 예약 전 확인 가이드"
+          description="하이퍼블릭부터 텐프로·일프로까지 업종 통칭의 의미, 룸과 시간, 주대·TC·RT, 예약과 안전한 이용 원칙을 한 번에 정리했습니다."
+          chapters={seoChapters}
+          id="home-complete-guide"
+        />
 
         <FaqBlock />
         <BottomContact />

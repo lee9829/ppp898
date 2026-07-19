@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { countSeoCharacters, type SeoChapter } from "./seo-content";
 import { categories, priceRows, sharedFaqs, type Category, type FaqItem, type Venue } from "./site-data";
 
 export function SiteHeader() {
@@ -193,4 +194,72 @@ export function BottomContact() {
 
 export function MobileBottomCta() {
   return <Link className="mobile-bottom-cta" href="/블로그/강남-하이퍼블릭-이용팁"><i className="ph ph-list-checks" aria-hidden="true" />첫 방문 체크</Link>;
+}
+
+export function SeoLongform({
+  title,
+  description,
+  chapters,
+  id = "complete-guide",
+}: {
+  title: string;
+  description: string;
+  chapters: SeoChapter[];
+  id?: string;
+}) {
+  const characterCount = countSeoCharacters(chapters);
+  const readingMinutes = Math.max(10, Math.ceil(characterCount / 500));
+
+  return (
+    <section className="section seo-longform" id={id}>
+      <div className="shell">
+        <header className="seo-longform-heading">
+          <div>
+            <p className="section-kicker">COMPLETE SEO GUIDE</p>
+            <h2>{title}</h2>
+          </div>
+          <div className="seo-longform-summary">
+            <p>{description}</p>
+            <span><i className="ph ph-book-open-text" aria-hidden="true" /> 완전 가이드 · 약 {readingMinutes}분 읽기</span>
+          </div>
+        </header>
+
+        <nav className="seo-toc" aria-label={`${title} 목차`}>
+          <strong>이 페이지에서 확인할 내용</strong>
+          <ol>
+            {chapters.map((chapter, index) => (
+              <li key={chapter.id}>
+                <a href={`#${chapter.id}`}><span>{String(index + 1).padStart(2, "0")}</span>{chapter.title}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <div className="seo-chapter-list">
+          {chapters.map((chapter) => (
+            <article className="seo-chapter" id={chapter.id} key={chapter.id}>
+              <header>
+                <p>{chapter.kicker}</p>
+                <h2>{chapter.title}</h2>
+                <div className="seo-chapter-intro">{chapter.intro}</div>
+              </header>
+              <div className="seo-subsection-grid">
+                {chapter.subsections.map((subsection) => (
+                  <section className="seo-subsection" key={subsection.title}>
+                    <h3>{subsection.title}</h3>
+                    {subsection.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                    {subsection.bullets && (
+                      <ul>
+                        {subsection.bullets.map((bullet) => <li key={bullet}><i className="ph ph-check" aria-hidden="true" />{bullet}</li>)}
+                      </ul>
+                    )}
+                  </section>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
