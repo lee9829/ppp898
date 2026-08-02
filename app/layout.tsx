@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   },
   description:
     "강남 하이퍼블릭, 셔츠룸, 쩜오, 가라오케, 텐카페, 텐프로, 일프로의 차이와 비용 용어, 예약 전 확인사항을 정리했습니다.",
+  verification: {
+    google: "T1ZGvjnhQmMo0QhEasMg1hBuHdWuE94QiYhe_AIn0SM",
+  },
   alternates: {
     canonical: "/",
   },
