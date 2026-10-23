@@ -8,6 +8,8 @@ import {
   Breadcrumb,
   FaqBlock,
   MobileBottomCta,
+  OtherVenues,
+  PhoneReservationButton,
   PriceTable,
   SeoLongform,
   SiteFooter,
@@ -22,13 +24,14 @@ import {
   countSeoWords,
 } from "../seo-content";
 import { siteUrl } from "../site-config";
+import { blogIndexCopy, categoryCopy, imageAlt, venueCopy } from "../site-copy";
+import { pageMetadata } from "../page-metadata";
 import {
   blogPosts,
   categories,
   hostessImagePool,
   imageSet,
   legalPages,
-  venueDirectory,
   type BlogPost,
   type Category,
   type FaqItem,
@@ -83,58 +86,34 @@ function faqSchema(faqs: readonly FaqItem[]) {
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const { slug: rawSlug } = await params;
   const { slug, first, category, venue, post, legal } = resolvePage(rawSlug);
-
   if (slug.length === 2 && venue && category) {
-    const title = `강남 ${venue.name} ${category.shortName} | 예약·비용 확인`;
-    return {
-      title,
-      description: venue.metaDescription,
-      keywords: [`강남 ${venue.name}`, `${venue.name} ${category.shortName}`, `${venue.name} 예약`, `${venue.name} 비용`],
-      alternates: { canonical: `/${category.slug}/${venue.slug}` },
-      openGraph: { title, description: venue.metaDescription, url: `/${category.slug}/${venue.slug}`, images: [venue.image] },
-    };
+    const copy = venueCopy[venue.slug];
+    return pageMetadata({ h1: `${copy.lead} ${copy.subtitle}`, description: copy.description, path: `/${category.slug}/${venue.slug}`, image: venue.image });
   }
   if (slug.length === 1 && category) {
-    const title = `${category.name} 뜻·가격·예약 가이드`;
-    return {
-      title,
-      description: category.longDescription,
-      keywords: [category.name, `${category.shortName} 뜻`, `${category.shortName} 가격`, `${category.shortName} 예약`],
-      alternates: { canonical: `/${category.slug}` },
-      openGraph: { title, description: category.longDescription, url: `/${category.slug}`, images: [category.image] },
-    };
+    const copy = categoryCopy[category.slug];
+    return pageMetadata({ h1: `${copy.lead} ${copy.subtitle}`, description: copy.description, path: `/${category.slug}`, image: category.image, shortened: copy.metaTitle });
   }
-  if (slug.length === 2 && post) {
-    return {
-      title: post.title,
-      description: post.excerpt,
-      keywords: [post.title, post.category, "강남 밤문화", "강남 룸 예약"],
-      authors: [{ name: "강남의 밤 편집팀" }],
-      category: post.category,
-      alternates: { canonical: `/블로그/${post.slug}` },
-      openGraph: { type: "article", title: post.title, description: post.excerpt, url: `/블로그/${post.slug}`, images: [post.image], publishedTime: post.isoDate },
-    };
-  }
-  if (slug.length === 1 && first === "블로그") {
-    const title = "강남 밤문화 블로그 | 예약·가격 용어·에티켓";
-    const description = "강남 하이퍼블릭 첫 방문 체크리스트, 주대·TC·RT 뜻, 안전한 예약과 결제 에티켓을 검색 질문별로 안내합니다.";
-    return { title, description, keywords: ["강남 밤문화 블로그", "강남 룸 예약", "주대 TC RT", "강남 밤문화 에티켓"], alternates: { canonical: "/블로그" }, openGraph: { title, description, url: "/블로그", images: [imageSet.group] } };
-  }
-  if (slug.length === 1 && legal) {
-    return { title: legal.title, description: legal.description, alternates: { canonical: `/${first}` } };
-  }
-  return { title: "페이지를 찾을 수 없습니다", robots: { index: false, follow: false } };
+  if (slug.length === 2 && post) return {
+    ...pageMetadata({ h1: post.title, description: post.excerpt, path: `/블로그/${post.slug}`, image: post.image, article: { publishedTime: post.isoDate } }),
+    authors: [{ name: "강남의밤 편집팀" }], category: post.category,
+  };
+  if (slug.length === 1 && first === "블로그") return pageMetadata({ h1: blogIndexCopy.title, description: blogIndexCopy.description, path: "/블로그", image: imageSet.group });
+  if (slug.length === 1 && legal) return pageMetadata({ h1: legal.title, description: legal.description, path: `/${first}` });
+  return { title: { absolute: "페이지를 찾을 수 없습니다 - 강남의밤" }, robots: { index: false, follow: false } };
 }
 
 function CategoryPage({ category }: { category: Category }) {
   const categoryIndex = categories.findIndex((item) => item.slug === category.slug);
-  const introImage = hostessImagePool[(categoryIndex + 2) % hostessImagePool.length];
-  const guideImage = hostessImagePool[(categoryIndex + 5) % hostessImagePool.length];
+  const copy = categoryCopy[category.slug];
+  const supportingImages = hostessImagePool.filter((image) => image !== category.image);
+  const introImage = supportingImages[(categoryIndex + 2) % supportingImages.length];
+  const guideImage = supportingImages[(categoryIndex + 5) % supportingImages.length];
   const seoChapters = buildCategorySeoChapters(category);
   const categorySchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `${category.name} 뜻·가격·예약 가이드`,
+    name: `${copy.lead} ${copy.subtitle}`,
     description: category.longDescription,
     url: `${siteUrl}/${category.slug}`,
     inLanguage: "ko-KR",
@@ -145,17 +124,16 @@ function CategoryPage({ category }: { category: Category }) {
       <SiteHeader />
       <main id="main-content">
         <section className="inner-visual-hero category-visual-hero">
-          <img src={category.image} alt={`${category.name} 가이드의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" />
+          <img src={category.image} alt={imageAlt(category.image, `${category.name} 대표 화보`)} fetchPriority="high" width="1600" height="1000" />
           <span className="inner-hero-shade" aria-hidden="true" />
           <span className="inner-hero-grid" aria-hidden="true" />
           <div className="shell inner-hero-content">
             <Breadcrumb items={[{ label: category.shortName }]} />
             <p className="eyebrow"><span>ADULT GUIDE</span>{category.eyebrow}</p>
-            <h1>{category.name}<br /><em>뜻·가격 용어·예약 체크</em></h1>
-            <p>{category.longDescription}</p>
+            <h1>{copy.lead}<br /><em>{copy.subtitle}</em></h1>
+            <p>{copy.description}</p>
             <div className="inner-hero-actions">
-              <a className="primary-button large-button" href="#about">업종 특징 알아보기 <i className="ph ph-arrow-down" aria-hidden="true" /></a>
-              <a className="ghost-button" href="#price">비용 용어 확인 <i className="ph ph-arrow-right" aria-hidden="true" /></a>
+              <PhoneReservationButton label={`${category.shortName} 예약문의`} className="large-button" />
             </div>
             <ul className="hero-highlight-list">{category.highlights.map((item) => <li key={item}><i className="ph ph-check-circle" aria-hidden="true" />{item}</li>)}</ul>
           </div>
@@ -181,7 +159,7 @@ function CategoryPage({ category }: { category: Category }) {
               <div className="info-chip-row">{category.highlights.map((item) => <span key={item}>{item}</span>)}</div>
             </div>
             <figure className="portrait-side-card">
-              <img src={introImage} alt={`${category.name} 분위기를 보여주는 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" />
+              <img src={introImage} alt={imageAlt(introImage, `${category.name} 업종 소개`)} width="1600" height="1000" loading="lazy" />
               <figcaption><span>CHECK THE DETAILS</span><strong>이름보다 실제 조건을 비교하세요</strong></figcaption>
             </figure>
           </div>
@@ -197,7 +175,7 @@ function CategoryPage({ category }: { category: Category }) {
               <div className="people-venue-grid">{category.venues.map((venue, index) => <VenueCard venue={venue} category={category} index={index} key={venue.slug} />)}</div>
             ) : (
               <div className="empty-venue-editorial">
-                <img src={guideImage} alt={`${category.name} 안내의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" />
+                <img src={guideImage} alt={imageAlt(guideImage, `${category.name} 예약 안내`)} width="1600" height="1000" loading="lazy" />
                 <span className="people-venue-overlay" aria-hidden="true" />
                 <div><p>BEFORE YOU BOOK</p><h3>{category.name}, 먼저 네 가지를 정하세요.</h3><span>모임 목적 · 성인 인원 · 이용 시간 · 예산 범위</span></div>
               </div>
@@ -228,14 +206,15 @@ function CategoryPage({ category }: { category: Category }) {
         </section>
         <SeoLongform
           title={`${category.name} 완전 가이드`}
-          description={`${category.name}의 뜻과 공간, 비용, 예약, 방문 당일 확인사항을 검색 의도에 맞춰 H2·H3 구조로 정리했습니다.`}
+          description={`${category.name}의 뜻과 룸 구성, 주대와 예약 절차부터 방문 당일 확인사항까지 차례로 살펴보세요.`}
           chapters={seoChapters}
           id="category-complete-guide"
         />
         <FaqBlock title={`${category.shortName} 자주 묻는 질문`} faqs={category.faqs} />
-        <BottomContact />
+        <OtherVenues categorySlug={category.slug} />
+        <BottomContact label={`${category.shortName} 예약문의`} />
       </main>
-      <SiteFooter /><MobileBottomCta />
+      <SiteFooter /><MobileBottomCta label={`${category.shortName} 예약문의`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(categorySchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(category.faqs)) }} />
     </>
@@ -243,15 +222,15 @@ function CategoryPage({ category }: { category: Category }) {
 }
 
 function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
-  const related = category.venues.filter((item) => item.slug !== venue.slug).slice(0, 3);
-  const venueIndex = venueDirectory.findIndex((item) => item.category.slug === category.slug && item.slug === venue.slug);
-  const introImage = hostessImagePool[(venueIndex + 2) % hostessImagePool.length];
-  const reservationImage = hostessImagePool[(venueIndex + 5) % hostessImagePool.length];
+  const copy = venueCopy[venue.slug];
+  const imageIndex = hostessImagePool.indexOf(venue.image);
+  const introImage = hostessImagePool[(imageIndex + 5) % hostessImagePool.length];
+  const reservationImage = hostessImagePool[(imageIndex + 11) % hostessImagePool.length];
   const seoChapters = buildVenueSeoChapters(category, venue);
   const venueSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `강남 ${venue.name} ${category.shortName} 예약·이용 정보`,
+    name: `${copy.lead} ${copy.subtitle}`,
     description: venue.metaDescription,
     url: `${siteUrl}/${category.slug}/${venue.slug}`,
     isPartOf: { "@type": "WebSite", name: "강남의 밤", url: `${siteUrl}/` },
@@ -263,13 +242,13 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
       <SiteHeader />
       <main id="main-content">
         <section className="venue-detail-hero">
-          <div className="venue-detail-image"><img src={venue.image} alt={`강남 ${venue.name} 가이드의 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" /><span className="venue-detail-shade" aria-hidden="true" /></div>
+          <div className="venue-detail-image"><img src={venue.image} alt={imageAlt(venue.image, `강남 ${venue.name} ${category.shortName} 대표 화보`)} fetchPriority="high" width="1600" height="1000" /><span className="venue-detail-shade" aria-hidden="true" /></div>
           <div className="shell venue-detail-hero-content">
             <Breadcrumb items={[{ label: category.shortName, href: `/${category.slug}` }, { label: venue.name }]} />
             <p className="eyebrow"><span>VENUE CHECK</span>{venue.mood}</p>
-            <h1>강남 {venue.name}<br /><em>{category.shortName} 예약·이용 정보</em></h1>
-            <p>{venue.summary}. 운영 여부와 실제 조건은 방문 전에 공식 안내 채널에서 다시 확인하세요.</p>
-            <div className="venue-detail-actions"><a className="primary-button large-button" href="#intro">핵심 정보 보기 <i className="ph ph-arrow-down" aria-hidden="true" /></a><a className="ghost-button" href="#price">비용 용어 확인 <i className="ph ph-arrow-right" aria-hidden="true" /></a></div>
+            <h1>{copy.lead}<br /><em>{copy.subtitle}</em></h1>
+            <p>{copy.description}</p>
+            <div className="venue-detail-actions"><PhoneReservationButton label={`${venue.name} 예약문의`} className="large-button" /></div>
           </div>
           <div className="detail-page-mark"><span>CHECK FIRST</span><strong>ROOM · TIME · COST</strong></div>
         </section>
@@ -287,7 +266,7 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
               <p>{venue.decisionTip}</p>
               <div className="info-chip-row"><span>룸·인원 확인</span><span>시간·비용 확인</span><span>예약 기록 보관</span></div>
             </div>
-            <figure className="venue-intro-image"><img src={introImage} alt={`${venue.name} 정보와 함께 보는 아이돌풍 드레스의 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><figcaption><span>CHOOSE BY PURPOSE</span><strong>방문 목적에 맞는 조건을 확인하세요</strong></figcaption></figure>
+            <figure className="venue-intro-image"><img src={introImage} alt={imageAlt(introImage, `강남 ${venue.name} ${category.shortName} 방문 준비`)} width="1600" height="1000" loading="lazy" /><figcaption><span>CHOOSE BY PURPOSE</span><strong>방문 목적에 맞는 조건을 확인하세요</strong></figcaption></figure>
           </div>
         </section>
 
@@ -319,8 +298,8 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
 
         <section className="section reservation-section" id="reservation">
           <div className="shell reservation-panel">
-            <div className="reservation-image"><img src={reservationImage} alt={`${venue.name} 예약 체크리스트 옆 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /></div>
-            <div className="reservation-copy"><p className="section-kicker">RESERVATION CHECK</p><h2>예약 메시지에<br />네 가지를 남기세요.</h2><ul>{venue.reservationQuestions.map((item) => <li key={item}><i className="ph ph-check-circle" aria-hidden="true" />{item}</li>)}</ul><Link className="primary-button" href="/블로그/주대-tc-rt-용어">주대·TC·RT 뜻 보기 <i className="ph ph-arrow-up-right" aria-hidden="true" /></Link></div>
+            <div className="reservation-image"><img src={reservationImage} alt={imageAlt(reservationImage, `강남 ${venue.name} ${category.shortName} 예약 확인`)} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /></div>
+            <div className="reservation-copy"><p className="section-kicker">RESERVATION CHECK</p><h2>예약 메시지에<br />네 가지를 남기세요.</h2><ul>{venue.reservationQuestions.map((item) => <li key={item}><i className="ph ph-check-circle" aria-hidden="true" />{item}</li>)}</ul><PhoneReservationButton label={`${venue.name} 예약문의`} /></div>
           </div>
         </section>
 
@@ -347,11 +326,11 @@ function VenuePage({ category, venue }: { category: Category; venue: Venue }) {
           id="venue-complete-guide"
         />
 
-        {related.length > 0 && <section className="section related-venues-section"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">COMPARE MORE</p><h2>함께 비교할 {category.shortName}</h2></div><Link className="text-link" href={`/${category.slug}`}>{category.shortName} 전체 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link></div><div className="people-venue-grid related-grid">{related.map((item, index) => <VenueCard venue={item} category={category} index={index} key={item.slug} />)}</div></div></section>}
         <FaqBlock title={`${venue.name} 자주 묻는 질문`} faqs={venue.faqs} />
-        <BottomContact />
+        <OtherVenues categorySlug={category.slug} venueSlug={venue.slug} />
+        <BottomContact label={`${venue.name} 예약문의`} />
       </main>
-      <SiteFooter /><MobileBottomCta />
+      <SiteFooter /><MobileBottomCta label={`${venue.name} 예약문의`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(venueSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(venue.faqs)) }} />
     </>
@@ -363,8 +342,8 @@ function BlogIndex() {
   const collectionSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "강남 밤문화 블로그",
-    description: "강남 밤문화 예약, 비용 용어와 안전한 이용 정보를 다루는 실전 가이드 모음",
+    name: "강남 유흥 블로그",
+    description: "강남 유흥 예약, 비용 용어와 안전한 이용 정보를 다루는 실전 가이드 모음",
     url: `${siteUrl}/블로그`,
     inLanguage: "ko-KR",
     mainEntity: {
@@ -379,10 +358,10 @@ function BlogIndex() {
   };
   return (
     <><SiteHeader /><main id="main-content">
-      <section className="blog-index-hero"><img src={imageSet.group} alt="글래머러스한 드레스를 입은 20대 성인 한국 여성 모델 네 명" width="1600" height="1000" /><span className="inner-hero-shade" aria-hidden="true" /><div className="shell"><Breadcrumb items={[{ label: "블로그" }]} /><p className="eyebrow"><span>EDITORIAL</span>NIGHT GUIDE JOURNAL</p><h1>강남 밤문화 예약 전<br /><em>꼭 알아둘 실전 정보</em></h1><p>첫 방문 체크리스트부터 주대·TC·RT 뜻, 안전한 음주와 결제 에티켓까지 검색 질문별로 깊이 있게 안내합니다.</p></div></section>
-      <section className="section blog-index-content"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">SEARCH THE JOURNAL</p><h2>상황에 맞는 가이드를<br />빠르게 찾아보세요.</h2></div><p>카테고리를 선택하거나 제목·주제로 검색할 수 있습니다. 모든 글은 5,000자 이상의 장문 원고와 단계별 목차를 제공합니다.</p></div><BlogExplorer posts={blogPosts} /></div></section>
+      <section className="blog-index-hero"><img src={imageSet.group} alt={imageAlt(imageSet.group, "강남 유흥 블로그 대표 화보")} width="1600" height="1000" /><span className="inner-hero-shade" aria-hidden="true" /><div className="shell"><Breadcrumb items={[{ label: "블로그" }]} /><p className="eyebrow"><span>EDITORIAL</span>NIGHT GUIDE JOURNAL</p><h1>{blogIndexCopy.title}</h1><p>{blogIndexCopy.description}</p></div></section>
+      <section className="section blog-index-content"><div className="shell"><div className="section-heading split-heading"><div><p className="section-kicker">SEARCH THE JOURNAL</p><h2>상황에 맞는 가이드를<br />빠르게 찾아보세요.</h2></div><p>카테고리를 선택하거나 제목·주제로 검색할 수 있습니다. 첫 방문과 비용, 업종 비교와 단체 모임처럼 필요한 주제를 골라 읽어보세요.</p></div><BlogExplorer posts={blogPosts} /></div></section>
       <SeoLongform
-        title="강남 밤문화 블로그 활용 가이드"
+        title="강남 유흥 블로그 활용 가이드"
         description="첫 방문, 가격, 업종 비교, 단체 모임과 안전 원칙까지 블로그를 검색 의도에 맞게 활용하는 방법입니다."
         chapters={seoChapters}
         id="blog-complete-guide"
@@ -412,7 +391,7 @@ function BlogArticle({ post }: { post: BlogPost }) {
   return (
     <><SiteHeader /><main id="main-content"><article>
       <header className="article-detail-hero"><div className="shell"><Breadcrumb items={[{ label: "블로그", href: "/블로그" }, { label: post.title }]} /><p className="eyebrow"><span>{post.category}</span>NIGHT GUIDE JOURNAL</p><h1>{post.title}</h1><p>{post.excerpt}</p><div className="article-meta"><span>강남의 밤 편집</span><span>{post.date}</span><span>읽는 시간 {post.readTime}</span></div></div></header>
-      <figure className="article-lead-image"><img src={post.image} alt={`${post.title} 글과 함께 보는 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" /><span className="people-venue-overlay" aria-hidden="true" /></figure>
+      <figure className="article-lead-image"><img src={post.image} alt={imageAlt(post.image, post.title)} width="1600" height="1000" /><span className="people-venue-overlay" aria-hidden="true" /></figure>
       <div className="shell article-body-layout">
         <aside><strong>CONTENTS</strong>{post.sections.map((section) => <a href={`#${section.id}`} key={section.id}>{section.title}</a>)}<a href="#article-complete-guide">5,000자 심층 가이드</a></aside>
         <div className="article-prose">
@@ -423,20 +402,20 @@ function BlogArticle({ post }: { post: BlogPost }) {
       </div>
       <SeoLongform
         title={`${post.title} 심층 가이드`}
-        description={`${post.excerpt} 실제 확인 순서와 질문 예시를 포함한 5,000자 이상의 확장 원고입니다.`}
+        description={post.excerpt}
         chapters={seoChapters}
         id="article-complete-guide"
       />
     </article>
-    <section className="section article-related"><div className="shell"><div className="section-heading"><p className="section-kicker">MORE STORIES</p><h2>함께 읽으면 좋은 글</h2></div><div className="editorial-post-grid">{blogPosts.filter((item) => item.slug !== post.slug).slice(0, 3).map((item, index) => <article className="editorial-post-card" key={item.slug}><Link className="editorial-post-image" href={`/블로그/${item.slug}`}><img src={item.image} alt={`${item.title} 글의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /><strong>0{index + 1}</strong></Link><div><p>{item.category} · {item.readTime}</p><h3><Link href={`/블로그/${item.slug}`}>{item.title}</Link></h3><span>{item.excerpt}</span></div></article>)}</div></div></section>
-    </main><SiteFooter /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} /></>
+    <section className="section article-related"><div className="shell"><div className="section-heading"><p className="section-kicker">MORE STORIES</p><h2>함께 읽으면 좋은 글</h2></div><div className="editorial-post-grid">{blogPosts.filter((item) => item.slug !== post.slug).slice(0, 3).map((item, index) => <article className="editorial-post-card" key={item.slug}><Link className="editorial-post-image" href={`/블로그/${item.slug}`}><img src={item.image} alt={imageAlt(item.image, item.title)} width="1600" height="1000" loading="lazy" /><span className="people-venue-overlay" aria-hidden="true" /><strong>0{index + 1}</strong></Link><div><p>{item.category} · {item.readTime}</p><h3><Link href={`/블로그/${item.slug}`}>{item.title}</Link></h3><span>{item.excerpt}</span></div></article>)}</div></div></section>
+    <BottomContact /></main><SiteFooter /><MobileBottomCta /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} /></>
   );
 }
 
 function LegalPage({ pageKey, page }: { pageKey: string; page: LegalPageData }) {
   return (
     <><SiteHeader /><main id="main-content">
-      <header className="legal-hero"><div className="shell"><Breadcrumb items={[{ label: page.title }]} /><p className="section-kicker">POLICY & INFORMATION</p><h1>{page.title}</h1><p>{page.description}</p><span>최종 업데이트 2026.07.16</span></div></header>
+      <header className="legal-hero"><div className="shell"><Breadcrumb items={[{ label: page.title }]} /><p className="section-kicker">POLICY & INFORMATION</p><h1>{page.title}</h1><p>{page.description}</p><span>최종 업데이트 2026.10.23</span></div></header>
       <div className="shell legal-layout">
         <aside><strong>CONTENTS</strong>{page.sections.map((section, index) => <a href={`#legal-${index + 1}`} key={section.title}>{section.title}</a>)}</aside>
         <article className="legal-content"><p className="legal-lead">{page.lead}</p>{page.sections.map((section, index) => <section id={`legal-${index + 1}`} key={section.title}><span>{String(index + 1).padStart(2, "0")}</span><h2>{section.title}</h2>{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}</article>

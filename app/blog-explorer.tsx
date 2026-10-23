@@ -4,6 +4,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { BlogPost } from "./site-data";
+import { imageAlt } from "./site-copy";
 
 const categoryLabels: Record<string, string> = {
   "FIRST VISIT": "첫 방문",
@@ -54,14 +55,14 @@ export default function BlogExplorer({ posts }: { posts: BlogPost[] }) {
           {filteredPosts.map((post, index) => (
             <article className={index === 0 ? "blog-feature-card" : "blog-list-card"} key={post.slug}>
               <Link href={`/블로그/${post.slug}`}>
-                <img src={post.image} alt={`${post.title} 안내 이미지의 20대 성인 여성 모델`} width="1600" height="1000" />
+                <img src={post.image} alt={imageAlt(post.image, post.title)} width="1600" height="1000" />
                 <span className="people-venue-overlay" aria-hidden="true" />
               </Link>
               <div>
                 <p>{categoryLabels[post.category] ?? post.category} · {post.date} · {post.readTime}</p>
                 <h2><Link href={`/블로그/${post.slug}`}>{post.title}</Link></h2>
                 <span>{post.excerpt}</span>
-                <Link className="card-detail-link" href={`/블로그/${post.slug}`}>5,000자 전체 가이드 읽기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
+                <Link className="card-detail-link" href={`/블로그/${post.slug}`}>전체 가이드 읽기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
               </div>
             </article>
           ))}

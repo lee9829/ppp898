@@ -5,12 +5,8 @@ import { siteUrl } from "./site-config";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: "강남 밤문화 가이드 | 업종 비교·가격 용어·예약 체크",
-    template: "%s | 강남의 밤",
-  },
-  description:
-    "강남 하이퍼블릭, 셔츠룸, 쩜오, 가라오케, 텐카페, 텐프로, 일프로의 차이와 비용 용어, 예약 전 확인사항을 정리했습니다.",
+  title: { default: "강남 유흥 가이드 - 강남의밤", template: "%s - 강남의밤" },
+  description: "강남 유흥 업종과 업체별 주대, 룸 구성과 예약 조건을 비교하는 강남의밤 정보 가이드입니다.",
   verification: {
     google: "T1ZGvjnhQmMo0QhEasMg1hBuHdWuE94QiYhe_AIn0SM",
   },
@@ -22,9 +18,9 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     url: "/",
     siteName: "강남의 밤",
-    title: "강남 밤문화 가이드 | 업종 비교·가격 용어·예약 체크",
+    title: "강남 유흥 가이드 - 강남의밤",
     description:
-      "강남 밤문화 업종의 차이, 주대·TC·RT 뜻, 룸과 인원 선택, 예약·결제 전에 확인할 내용을 한눈에 살펴보세요.",
+      "강남 유흥 업종의 차이, 주대·TC·RT 뜻, 룸과 인원 선택, 예약·결제 전에 확인할 내용을 한눈에 살펴보세요.",
     images: [
       {
         url: "/assets/idol-hero-bright.webp",

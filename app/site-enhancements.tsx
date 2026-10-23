@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function SiteEnhancements() {
+  const pathname = usePathname();
   useEffect(() => {
     const cleanups: Array<() => void> = [];
     const form = document.querySelector<HTMLFormElement>(".quick-search");
@@ -62,7 +64,7 @@ export default function SiteEnhancements() {
     });
 
     return () => cleanups.forEach((cleanup) => cleanup());
-  }, []);
+  }, [pathname]);
 
   return null;
 }

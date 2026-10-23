@@ -6,7 +6,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -28,5 +28,5 @@
     "typescript": "5.9.3"
   },
   "type": "module",
-  "displayName": "\uac00\uc774\ub4dc\ub77c\uc778 \uc6f9 \uc2dc\uc548"
+  "displayName": "가이드라인 웹 시안"
 }

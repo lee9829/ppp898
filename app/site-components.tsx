@@ -1,7 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { countSeoCharacters, type SeoChapter } from "./seo-content";
-import { categories, priceRows, sharedFaqs, type Category, type FaqItem, type Venue } from "./site-data";
+import { categories, imageSet, priceRows, sharedFaqs, venueDirectory, type Category, type FaqItem, type Venue } from "./site-data";
+import { imageAlt } from "./site-copy";
+import { phoneHref, phoneNumber } from "./site-config";
+
+export function PhoneReservationButton({ label = "전화 예약 상담", className = "" }: { label?: string; className?: string }) {
+  return <a className={`primary-button phone-cta ${className}`} href={phoneHref} aria-label={`${label} ${phoneNumber}`}>
+    <svg className="phone-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9Z" /></svg>
+    <span>{label}</span><i className="ph ph-arrow-up-right" aria-hidden="true" />
+  </a>;
+}
 
 export function SiteHeader() {
   return (
@@ -39,7 +48,7 @@ export function SiteHeader() {
             <Link className="icon-button" href="/#quick-search" aria-label="정보 검색">
               <i className="ph ph-magnifying-glass" aria-hidden="true" />
             </Link>
-            <Link className="header-cta" href="/블로그/강남-하이퍼블릭-이용팁">첫 방문 가이드 <i className="ph ph-arrow-up-right" aria-hidden="true" /></Link>
+            <PhoneReservationButton label="예약문의" className="header-cta" />
           </div>
 
           <details className="mobile-menu">
@@ -48,7 +57,7 @@ export function SiteHeader() {
               <Link href="/">메인 홈</Link>
               {categories.map((category) => <Link href={`/${category.slug}`} key={category.slug}>{category.name}</Link>)}
               <Link href="/블로그">블로그</Link>
-              <Link className="mobile-contact" href="/블로그/강남-하이퍼블릭-이용팁">첫 방문 가이드</Link>
+              <PhoneReservationButton label="예약문의" className="mobile-contact" />
             </nav>
           </details>
         </div>
@@ -66,12 +75,13 @@ export function SiteFooter() {
             <span className="brand-mark" aria-hidden="true"><span>GN</span></span>
             <span className="brand-copy"><strong>강남의 밤</strong><small>GANGNAM NIGHT GUIDE</small></span>
           </Link>
-          <p>성인 대상 강남 밤문화 용어와 예약 전 확인사항을 과장 없이 정리하는 정보 가이드.</p>
+          <p>강남 유흥 업종 비교부터 업체 정보, 이용 방법과 주대 안내, 전화 예약 상담까지 한곳에서 확인할 수 있는 강남 유흥 정보 가이드입니다.</p>
+          <div className="footer-services"><span>업종 비교</span><a href={phoneHref}>전화 예약문의</a><span>친절한 안내</span></div>
         </div>
         <div className="footer-links">
-          <div><strong>CATEGORY</strong><Link href="/하이퍼블릭">하이퍼블릭</Link><Link href="/셔츠룸">셔츠룸</Link><Link href="/쩜오">쩜오</Link><Link href="/가라오케">가라오케</Link></div>
-          <div><strong>EXPLORE</strong><Link href="/텐카페">텐카페</Link><Link href="/텐프로">텐프로</Link><Link href="/일프로">일프로</Link><Link href="/블로그">블로그</Link></div>
-          <div><strong>LEGAL</strong><Link href="/회사소개">회사소개</Link><Link href="/개인정보처리방침">개인정보처리방침</Link><Link href="/이용약관">이용약관</Link><Link href="/법적고지사항">법적고지</Link></div>
+          <div><strong>CATEGORY</strong>{categories.map((category) => <Link href={`/${category.slug}`} key={category.slug}>{category.name}</Link>)}</div>
+          <div><strong>EXPLORE</strong><Link href="/#category-pages">업종별 비교</Link><Link href="/#popular-venues">업체 정보 BEST 6</Link><Link href="/#how-to-use">이용 방법</Link><Link href="/#price">가격·예약 정보</Link><Link href="/#faq">자주 묻는 질문</Link><Link href="/블로그">블로그</Link></div>
+          <div><strong>LEGAL</strong><Link href="/회사소개">회사소개</Link><Link href="/이용약관">이용약관</Link><Link href="/개인정보처리방침">개인정보처리방침</Link><Link href="/#how-to-use">이용안내</Link><Link href="/법적고지사항">법적고지</Link></div>
         </div>
       </div>
       <div className="shell footer-bottom">
@@ -99,7 +109,7 @@ export function Breadcrumb({ items }: { items: Array<{ label: string; href?: str
 export function CategoryImageCard({ category, index }: { category: Category; index: number }) {
   return (
     <Link className="category-image-card" href={`/${category.slug}`}>
-      <img src={category.image} alt={`${category.name} 안내 카드의 아이돌풍 드레스를 입은 20대 성인 여성 모델`} width="1600" height="1000" loading={index < 2 ? "eager" : "lazy"} />
+      <img src={category.image} alt={imageAlt(category.image, `${category.name} 업종 비교`)} width="1600" height="1000" loading="lazy" />
       <span className="category-image-overlay" aria-hidden="true" />
       <span className="category-card-number">0{index + 1}</span>
       <div className="category-image-content">
@@ -116,7 +126,7 @@ export function VenueCard({ venue, category, index }: { venue: Venue; category: 
   return (
     <article className="people-venue-card">
       <Link className="people-venue-media" href={`/${category.slug}/${venue.slug}`}>
-        <img src={venue.image} alt={`${venue.name} 안내 카드의 글래머러스한 20대 성인 여성 모델`} width="1600" height="1000" loading={index < 2 ? "eager" : "lazy"} />
+        <img src={venue.image} alt={imageAlt(venue.image, `강남 ${venue.name} ${category.shortName} 업체 안내`)} width="1600" height="1000" loading="lazy" />
         <span className="people-venue-overlay" aria-hidden="true" />
         <span className="people-venue-mood">{venue.mood}</span>
         <span className="people-venue-number">0{index + 1}</span>
@@ -125,7 +135,7 @@ export function VenueCard({ venue, category, index }: { venue: Venue; category: 
         <p>{category.shortName}</p>
         <h3><Link href={`/${category.slug}/${venue.slug}`}>강남 {venue.name}</Link></h3>
         <span>{venue.summary}</span>
-        <Link className="card-detail-link" href={`/${category.slug}/${venue.slug}`}>확인사항 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
+        <Link className="card-detail-link" href={`/${category.slug}/${venue.slug}`}>자세히 보기 <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
       </div>
     </article>
   );
@@ -165,7 +175,8 @@ export function FaqBlock({ title = "자주 묻는 질문", faqs = sharedFaqs }: 
         <div className="faq-heading">
           <p className="section-kicker">FREQUENTLY ASKED</p>
           <h2>{title}</h2>
-          <p>검색과 예약 과정에서 자주 생기는 궁금증을 실제 확인 순서에 맞춰 정리했습니다.</p>
+          <p>강남 유흥 예약 과정에서 자주 궁금해하시는 내용을 모았습니다. 아래에서 원하는 내용을 확인해 보세요.</p>
+          <div className="faq-help"><strong>더 궁금한 점이 있으신가요?</strong><p>아래 내용에 없는 문의사항은 전화로 편하게 상담해 주세요.</p><PhoneReservationButton label="전화로 문의하기" /></div>
         </div>
         <div className="faq-list">
           {faqs.map(([question, answer], index) => (
@@ -180,20 +191,36 @@ export function FaqBlock({ title = "자주 묻는 질문", faqs = sharedFaqs }: 
   );
 }
 
-export function BottomContact() {
+export function OtherVenues({ categorySlug, venueSlug }: { categorySlug?: string; venueSlug?: string }) {
+  const eligible = venueDirectory.filter((venue) => !(venue.category.slug === categorySlug && venue.slug === venueSlug));
+  const selected: typeof venueDirectory = [];
+  const add = (venue: (typeof venueDirectory)[number] | undefined) => {
+    if (venue && !selected.some((item) => item.slug === venue.slug && item.category.slug === venue.category.slug)) selected.push(venue);
+  };
+  add(eligible.find((venue) => venue.category.slug === categorySlug));
+  for (const category of categories.filter((item) => item.slug !== categorySlug)) add(eligible.find((venue) => venue.category.slug === category.slug));
+  for (const venue of eligible) { if (selected.length >= 6) break; add(venue); }
+  return <section className="section related-venues-section" id="browse-other-venues"><div className="shell">
+    <div className="section-heading split-heading"><div><p className="section-kicker">EXPLORE MORE</p><h2>다른 업체도 둘러보세요</h2></div><p>원하는 조건에 맞춰 다른 업종과 업체도 둘러보고, 비교한 후 선택하세요.</p></div>
+    <div className="people-venue-grid">{selected.map((venue, index) => <VenueCard venue={venue} category={venue.category} index={index} key={`${venue.category.slug}-${venue.slug}`} />)}</div>
+  </div></section>;
+}
+
+export function BottomContact({ label = "쉽고 빠른 전화 문의" }: { label?: string }) {
   return (
     <section className="section contact-section" id="contact">
       <div className="shell contact-panel page-contact-panel">
         <div className="contact-grid" aria-hidden="true" />
-        <div><p className="section-kicker">BEFORE YOU VISIT</p><h2>예약 전에 확인하면<br />현장에서 더 편합니다.</h2></div>
-        <div className="contact-copy"><p>날짜·시간·인원과 원하는 룸을 정한 뒤, 포함 항목과 추가 비용을 같은 문장으로 문의해 보세요. 첫 방문 체크리스트에서 순서대로 확인할 수 있습니다.</p><Link className="primary-button" href="/블로그/강남-하이퍼블릭-이용팁">첫 방문 체크리스트 <i className="ph ph-arrow-up-right" aria-hidden="true" /></Link></div>
+        <img className="contact-editorial-image" src={imageSet.classicBlack} alt="" width="1600" height="1000" loading="lazy" />
+        <div><p className="section-kicker">CONTACT US</p><h2>지금 바로<br /><em>전화 상담</em>하세요.</h2></div>
+        <div className="contact-copy"><p>원하는 업종과 방문 일정, 인원과 예산을 말씀해 주세요. 업체별 이용 조건과 예약 가능 여부를 상담하고, 주대와 추가 비용도 함께 확인해 보세요.</p><PhoneReservationButton label={label} /><a className="contact-number" href={phoneHref}>{phoneNumber}</a></div>
       </div>
     </section>
   );
 }
 
-export function MobileBottomCta() {
-  return <Link className="mobile-bottom-cta" href="/블로그/강남-하이퍼블릭-이용팁"><i className="ph ph-list-checks" aria-hidden="true" />첫 방문 체크</Link>;
+export function MobileBottomCta({ label = "전화 예약문의" }: { label?: string }) {
+  return <PhoneReservationButton label={label} className="mobile-bottom-cta" />;
 }
 
 export function SeoLongform({
@@ -215,7 +242,7 @@ export function SeoLongform({
       <div className="shell">
         <header className="seo-longform-heading">
           <div>
-            <p className="section-kicker">COMPLETE SEO GUIDE</p>
+            <p className="section-kicker">COMPLETE GUIDE</p>
             <h2>{title}</h2>
           </div>
           <div className="seo-longform-summary">

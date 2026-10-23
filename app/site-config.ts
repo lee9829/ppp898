@@ -5,4 +5,6 @@ export const siteUrl = (configuredUrl
   : "https://ppp898.vercel.app"
 ).replace(/\/$/, "");
 
-export const siteName = "강남의 밤";
+export const siteName = "강남의밤";
+export const phoneNumber = "010-4690-4050";
+export const phoneHref = "tel:01046904050";

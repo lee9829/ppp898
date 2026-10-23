@@ -3,7 +3,7 @@ import { blogPosts, categories, legalPages } from "./site-data";
 import { siteUrl } from "./site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date("2026-07-19T00:00:00+09:00");
+  const now = new Date("2026-10-23T00:00:00+09:00");
   const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
     url: `${siteUrl}/${category.slug}`,
     lastModified: now,

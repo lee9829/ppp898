@@ -59,7 +59,7 @@ function buildGuideChapters(context: GuideContext): SeoChapter[] {
           title: `${context.subject} 페이지를 효율적으로 읽는 순서`,
           paragraphs: [
             compact(`처음에는 정의와 대상 독자를 읽고, 다음으로 ${focusA}, ${focusB}, ${focusC} 순서로 조건을 좁히는 방식이 효율적입니다. 비용표부터 보면 저렴해 보이는 숫자에 시선이 고정될 수 있으므로, 먼저 필요한 공간과 이용 시간을 정한 뒤 같은 조건의 예상 총액을 비교하는 편이 더 정확합니다.`),
-            compact(`이 페이지의 H2 제목은 큰 의사결정 단계를, H3 제목은 실제로 확인할 질문을 뜻합니다. 처음 방문한다면 위에서 아래로 읽고, 이미 일정이 정해졌다면 예약·비용·당일 확인 섹션을 우선 보세요. 필요한 문장은 메모해 두었다가 문의할 때 그대로 활용하면 누락을 줄일 수 있습니다.`),
+            compact(`이 가이드는 방문 준비부터 예약과 비용 확인까지 필요한 내용을 순서대로 안내합니다. 처음 방문한다면 위에서 아래로 읽고, 이미 일정이 정해졌다면 예약·비용·당일 확인 섹션을 우선 보세요. 필요한 문장은 메모해 두었다가 문의할 때 그대로 활용하면 누락을 줄일 수 있습니다.`),
           ],
           bullets: [focusA, focusB, focusC, "공식 안내와 최신 정보 재확인"],
         },
@@ -231,10 +231,10 @@ function buildGuideChapters(context: GuideContext): SeoChapter[] {
 
 export function buildHomeSeoChapters(): SeoChapter[] {
   return buildGuideChapters({
-    subject: "강남 밤문화",
-    primaryKeyword: "강남 밤문화 업종 비교와 예약 가이드",
+    subject: "강남 유흥",
+    primaryKeyword: "강남 유흥 업종 비교와 예약 가이드",
     description: "하이퍼블릭, 셔츠룸, 쩜오, 가라오케, 텐카페, 텐프로와 일프로의 통칭을 구분하고 합리적으로 비교하는 방법",
-    definition: "강남 밤문화라는 표현은 서로 다른 룸형 업종과 모임 공간을 넓게 묶어 부르는 검색어입니다. 각 명칭은 공식 등급이나 품질 인증이 아닐 수 있으므로 이름만으로 서비스를 단정하면 안 됩니다.",
+    definition: "강남 유흥라는 표현은 서로 다른 룸형 업종과 모임 공간을 넓게 묶어 부르는 검색어입니다. 각 명칭은 공식 등급이나 품질 인증이 아닐 수 있으므로 이름만으로 서비스를 단정하면 안 됩니다.",
     audience: "처음 업종 차이를 알아보는 성인 이용자부터 단체 모임의 룸과 예산을 비교하려는 사람까지 활용할 수 있습니다.",
     comparisonTip: "업종 이름보다 모임 목적, 성인 인원, 공간, 이용 시간, 포함 항목과 변경 조건을 같은 순서로 비교하세요.",
     focusItems: ["업종별 차이", "룸과 성인 인원", "주대·TC·RT와 예상 총액"],
@@ -273,8 +273,8 @@ export function buildVenueSeoChapters(category: Category, venue: Venue): SeoChap
 
 export function buildBlogIndexSeoChapters(): SeoChapter[] {
   return buildGuideChapters({
-    subject: "강남 밤문화 블로그",
-    primaryKeyword: "강남 밤문화 블로그와 실전 이용 정보",
+    subject: "강남 유흥 블로그",
+    primaryKeyword: "강남 유흥 블로그와 실전 이용 정보",
     description: "첫 방문 준비, 업종 차이, 가격 용어, 예약 메시지, 안전과 결제 에티켓을 검색 질문별로 찾아보는 편집 가이드",
     definition: "강남의 밤 블로그는 특정 업소를 무조건 추천하는 목록이 아니라 성인 이용자가 예약 전에 스스로 조건을 확인할 수 있도록 질문과 비교 기준을 제공하는 정보형 아카이브입니다.",
     audience: "강남 룸 업종을 처음 알아보거나 비용 용어와 안전한 이용 원칙을 한 번에 정리하고 싶은 성인 독자에게 적합합니다.",
@@ -300,8 +300,8 @@ const articleProfiles: Record<string, { definition: string; audience: string; co
     focus: ["주대의 포함 구성", "TC의 인원·시간 단위", "RT·봉사료·연장 비용"],
     questions: ["주대에는 무엇이 포함되나요?", "TC는 몇 명·몇 분 기준인가요?", "필수 비용을 포함한 예상 총액은 얼마인가요?"],
   },
-  "안전한-밤문화-에티켓": {
-    definition: "안전한 밤문화는 합법적인 사업장을 확인하고 모든 사람의 의사와 사업장 규정을 존중하는 태도에서 시작합니다.",
+  "안전한-유흥-에티켓": {
+    definition: "안전한 유흥은 합법적인 사업장을 확인하고 모든 사람의 의사와 사업장 규정을 존중하는 태도에서 시작합니다.",
     audience: "예약부터 음주, 귀가와 결제까지 갈등과 위험을 줄이는 기본 원칙을 확인하려는 모든 성인 이용자를 위한 글입니다.",
     comparison: "분위기나 가격보다 공식 채널, 명확한 비용 고지, 성인 확인, 귀가 계획과 결제 증빙을 우선해 보세요.",
     focus: ["성인 확인과 상호 존중", "과음 예방과 귀가 계획", "예약 변경과 결제 증빙"],
@@ -314,7 +314,7 @@ const articleProfiles: Record<string, { definition: string; audience: string; co
     focus: ["첫 문의 문장", "포함·별도 비용 질문", "변경·취소 확인 메시지"],
     questions: ["첫 메시지에 무엇을 적나요?", "예상 총액은 어떻게 요청하나요?", "변경 내용은 어떻게 다시 확정하나요?"],
   },
-  "강남-밤문화-업종-비교": {
+  "강남-유흥-업종-비교": {
     definition: "하이퍼블릭·쩜오·텐카페 같은 표현은 시장에서 사용하는 통칭이며 공식 등급이나 서비스 품질을 보증하는 인증이 아닙니다.",
     audience: "업종 이름이 낯설고 내 모임 목적에 어떤 공간이 맞는지 비교하고 싶은 성인 독자를 위한 글입니다.",
     comparison: "업종명을 서열처럼 보지 말고 룸, 대화 환경, 인원, 시간, 비용 고지와 이용 규정을 같은 항목으로 비교하세요.",
@@ -333,7 +333,7 @@ const articleProfiles: Record<string, { definition: string; audience: string; co
 export function buildBlogArticleSeoChapters(post: BlogPost): SeoChapter[] {
   const profile = articleProfiles[post.slug] ?? {
     definition: post.lead,
-    audience: "강남 밤문화 관련 정보를 실제 예약 조건에 맞춰 확인하려는 성인 독자를 위한 글입니다.",
+    audience: "강남 유흥 관련 정보를 실제 예약 조건에 맞춰 확인하려는 성인 독자를 위한 글입니다.",
     comparison: "날짜, 인원, 룸, 시간과 비용 조건을 같은 기준으로 비교하세요.",
     focus: post.sections.slice(0, 3).map((section) => section.title),
     questions: post.sections.slice(0, 3).map((section) => `${section.title}에서 무엇을 확인하나요?`),
