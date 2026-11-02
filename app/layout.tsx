@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SiteEnhancements from "./site-enhancements";
 import { siteUrl } from "./site-config";
+import { imageAssetUrl } from "./site-images";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
       "강남 유흥 업종의 차이, 주대·TC·RT 뜻, 룸과 인원 선택, 예약·결제 전에 확인할 내용을 한눈에 살펴보세요.",
     images: [
       {
-        url: "/assets/idol-hero-bright.webp",
+        url: imageAssetUrl("/assets/idol-hero-bright.webp"),
         width: 1600,
         height: 1000,
         alt: "밝은 럭셔리 라운지의 20대 성인 아이돌풍 한국 여성 모델 세 명",

@@ -1,3 +1,5 @@
+import { imageAssetUrl } from "./site-images";
+
 // Page headings and the copy directly below them also drive server-rendered metadata.
 export type HeroCopy = { lead: string; subtitle: string; description: string; metaTitle?: string };
 
@@ -103,7 +105,7 @@ export const imageDescriptions: Record<string, string> = {
 };
 
 export function venueImage(slug: string) {
-  return `/assets/gangnam-${venueCopy[slug].filename}-hero.webp`;
+  return imageAssetUrl(`/assets/gangnam-${venueCopy[slug].filename}-hero.webp`);
 }
 
 const legacyImageDescriptions: Record<string, string> = {
@@ -116,7 +118,8 @@ const legacyImageDescriptions: Record<string, string> = {
 };
 
 export function imageAlt(image: string, context: string) {
-  const match = Object.values(venueCopy).find((copy) => image === `/assets/gangnam-${copy.filename}-hero.webp`);
-  const content = match ? imageDescriptions[match.filename] : legacyImageDescriptions[image];
+  const imagePath = image.split("?", 1)[0];
+  const match = Object.values(venueCopy).find((copy) => imagePath === `/assets/gangnam-${copy.filename}-hero.webp`);
+  const content = match ? imageDescriptions[match.filename] : legacyImageDescriptions[imagePath];
   return `${context} 콘셉트 이미지: ${content ?? "이브닝드레스 차림의 성인 여성 모델"}`;
 }

@@ -1,4 +1,5 @@
 import { categoryCopy, venueCopy, venueImage } from "./site-copy";
+import { imageAssetUrl } from "./site-images";
 
 export type ContentFeature = {
   title: string;
@@ -68,18 +69,18 @@ export type LegalPage = {
 };
 
 const imageSet = {
-  hero: "/assets/idol-hero-bright.webp",
-  group: "/assets/idol-group-luminous.webp",
-  detail: "/assets/idol-ivory-suit.webp",
-  ivory: "/assets/idol-ivory-suit.webp",
-  burgundy: "/assets/idol-coral-lounge.webp",
-  emerald: "/assets/idol-duo-pastel.webp",
-  duo: "/assets/idol-duo-pastel.webp",
-  classicBlack: "/assets/idol-lilac-dress.webp",
-  classicGroup: "/assets/idol-group-luminous.webp",
-  classicBlue: "/assets/idol-lilac-dress.webp",
-  lounge: "/assets/idol-coral-lounge.webp",
-  city: "/assets/idol-hero-bright.webp",
+  hero: imageAssetUrl("/assets/idol-hero-bright.webp"),
+  group: imageAssetUrl("/assets/idol-group-luminous.webp"),
+  detail: imageAssetUrl("/assets/idol-ivory-suit.webp"),
+  ivory: imageAssetUrl("/assets/idol-ivory-suit.webp"),
+  burgundy: imageAssetUrl("/assets/idol-coral-lounge.webp"),
+  emerald: imageAssetUrl("/assets/idol-duo-pastel.webp"),
+  duo: imageAssetUrl("/assets/idol-duo-pastel.webp"),
+  classicBlack: imageAssetUrl("/assets/idol-lilac-dress.webp"),
+  classicGroup: imageAssetUrl("/assets/idol-group-luminous.webp"),
+  classicBlue: imageAssetUrl("/assets/idol-lilac-dress.webp"),
+  lounge: imageAssetUrl("/assets/idol-coral-lounge.webp"),
+  city: imageAssetUrl("/assets/idol-hero-bright.webp"),
 };
 
 const categorySource: Category[] = [
